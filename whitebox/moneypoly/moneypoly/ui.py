@@ -1,3 +1,4 @@
+"""UI module: print helpers and input utilities for MoneyPoly."""
 def print_banner(title):
     """Print a decorated section header."""
     width = 52

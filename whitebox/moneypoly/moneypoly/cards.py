@@ -1,3 +1,4 @@
+"""Cards module: defines Chance and Community Chest card decks."""
 import random
 
 CHANCE_CARDS = [

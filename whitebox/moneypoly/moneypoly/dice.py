@@ -1,3 +1,4 @@
+"""Dice module: simulates a pair of six-sided dice."""
 import random
 from moneypoly.config import BOARD_SIZE
 

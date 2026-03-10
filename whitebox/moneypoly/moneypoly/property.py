@@ -1,3 +1,4 @@
+"""Property module: defines purchasable properties and colour groups."""
 class Property:
     """Represents a single purchasable property tile on the MoneyPoly board."""
 

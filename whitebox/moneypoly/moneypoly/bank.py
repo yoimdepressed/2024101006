@@ -1,3 +1,4 @@
+"""Bank module: manages the bank funds, loans, and transactions."""
 import math
 from moneypoly.config import BANK_STARTING_FUNDS
 
