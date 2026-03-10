@@ -42,7 +42,6 @@ class Player:
         Awards the Go salary if the player passes or lands on Go.
         Returns the new board position.
         """
-        old_position = self.position
         self.position = (self.position + steps) % BOARD_SIZE
 
         if self.position == 0:
@@ -85,3 +84,4 @@ class Player:
 
     def __repr__(self):
         return f"Player({self.name!r}, balance={self.balance}, pos={self.position})"
+    
