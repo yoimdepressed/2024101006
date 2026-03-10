@@ -4,6 +4,7 @@ from moneypoly.config import BANK_STARTING_FUNDS
 
 
 class Bank:
+    """Represents the MoneyPoly bank managing reserves, loans, and collections."""
     def __init__(self):
         self._funds = BANK_STARTING_FUNDS
         self._loans_issued = []
