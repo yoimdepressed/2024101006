@@ -1,6 +1,5 @@
 """Game module: manages the full state and flow of a MoneyPoly game session."""
 from moneypoly.config import (
-    GO_TO_JAIL_POSITION,
     JAIL_FINE,
     AUCTION_MIN_INCREMENT,
     INCOME_TAX_AMOUNT,
