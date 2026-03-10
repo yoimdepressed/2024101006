@@ -75,43 +75,34 @@ class Game:
         position = player.position
         tile = self.board.get_tile_type(position)
         print(f"  {player.name} moved to position {position}  [{tile}]")
+        self._resolve_tile(player, position, tile)
+        self._check_bankruptcy(player)
 
+    def _resolve_tile(self, player, position, tile):
+        """Trigger the effect of the tile at `position`."""
         if tile == "go_to_jail":
             player.go_to_jail()
             print(f"  {player.name} has been sent to Jail!")
-
         elif tile == "income_tax":
             player.deduct_money(INCOME_TAX_AMOUNT)
             self.bank.collect(INCOME_TAX_AMOUNT)
             print(f"  {player.name} paid income tax: ${INCOME_TAX_AMOUNT}.")
-
         elif tile == "luxury_tax":
             player.deduct_money(LUXURY_TAX_AMOUNT)
             self.bank.collect(LUXURY_TAX_AMOUNT)
             print(f"  {player.name} paid luxury tax: ${LUXURY_TAX_AMOUNT}.")
-
         elif tile == "free_parking":
             print(f"  {player.name} rests on Free Parking. Nothing happens.")
-
         elif tile == "chance":
             card = self.chance_deck.draw()
             self._apply_card(player, card)
-
         elif tile == "community_chest":
             card = self.community_deck.draw()
             self._apply_card(player, card)
-
-        elif tile == "railroad":
+        elif tile in ("railroad", "property"):
             prop = self.board.get_property_at(position)
             if prop is not None:
                 self._handle_property_tile(player, prop)
-
-        elif tile == "property":
-            prop = self.board.get_property_at(position)
-            if prop is not None:
-                self._handle_property_tile(player, prop)
-
-        self._check_bankruptcy(player)
 
 
     def _handle_property_tile(self, player, prop):
