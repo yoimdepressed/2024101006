@@ -292,19 +292,15 @@ class Game:
         if action == "collect":
             amount = self.bank.pay_out(value)
             player.add_money(amount)
-
         elif action == "pay":
             player.deduct_money(value)
             self.bank.collect(value)
-
         elif action == "jail":
             player.go_to_jail()
             print(f"  {player.name} has been sent to Jail!")
-
         elif action == "jail_free":
             player.get_out_of_jail_cards += 1
             print(f"  {player.name} now holds a Get Out of Jail Free card.")
-
         elif action == "move_to":
             old_pos = player.position
             player.position = value
@@ -316,18 +312,15 @@ class Game:
                 prop = self.board.get_property_at(value)
                 if prop:
                     self._handle_property_tile(player, prop)
+        elif action in ("birthday", "collect_from_all"):
+            self._distribute_payment(player, value)
 
-        elif action == "birthday":
-            for other in self.players:
-                if other != player and other.balance >= value:
-                    other.deduct_money(value)
-                    player.add_money(value)
-
-        elif action == "collect_from_all":
-            for other in self.players:
-                if other != player and other.balance >= value:
-                    other.deduct_money(value)
-                    player.add_money(value)
+    def _distribute_payment(self, player, amount):
+        """Collect `amount` from every other player and give it to `player`."""
+        for other in self.players:
+            if other != player and other.balance >= amount:
+                other.deduct_money(amount)
+                player.add_money(amount)
 
 
     def _check_bankruptcy(self, player):
