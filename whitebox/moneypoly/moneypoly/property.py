@@ -4,7 +4,7 @@ class Property:
     """Represents a single purchasable property tile on the MoneyPoly board."""
 
     FULL_GROUP_MULTIPLIER = 2
-    # pylint: disable=too-many-arguments  # All 6 args required to fully define a property
+    # pylint: disable=too-many-arguments,too-many-positional-arguments  # All 6 args required to fully define a property
     def __init__(self, name, position, price, base_rent, group=None):
         self.name = name
         self.position = position
