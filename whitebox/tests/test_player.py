@@ -106,16 +106,14 @@ class TestMove:
         assert p.position == 0
         assert p.balance == STARTING_BALANCE + GO_SALARY
 
-    def test_move_passing_go_does_not_collect_salary(self):
+    def test_move_passing_go_collects_salary(self):
         """
-        BUG EXPOSED: Player passing Go (position > 0 after wrapping) should
-        collect GO_SALARY, but the code only checks position == 0.
-        Moving from 38 by 5 steps lands on position 3 (passed Go),
-        but no salary is awarded.
+        After fix (Error 5): Player passing Go without landing on it
+        should collect GO_SALARY. Moving from 38 by 5 steps lands on
+        position 3 (passed Go) and salary must be awarded.
         """
         p = Player("Alice")
         p.position = 38
         p.move(5)  # 38 + 5 = 43 % 40 = 3 — passed Go
         assert p.position == 3
-        # BUG: balance stays the same instead of increasing by GO_SALARY
-        assert p.balance == STARTING_BALANCE
+        assert p.balance == STARTING_BALANCE + GO_SALARY

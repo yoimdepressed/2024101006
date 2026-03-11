@@ -48,7 +48,7 @@ class TestDiceRoll:
         total = d.roll()
         random.randint = original
         # BUG: upper bound is 5, total is 10 instead of the correct 12
-        assert total == 10
+        assert total == 12
 
     def test_roll_doubles_increments_streak(self):
         """Branch: doubles roll increments doubles_streak."""
