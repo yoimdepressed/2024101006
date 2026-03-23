@@ -1,7 +1,7 @@
 # 2024101006 — Software Testing Assignment
 
 Git Repository: https://github.com/yoimdepressed/2024101006
-OneDrive Link: <INSERT_ONEDRIVE_LINK_HERE> (includes .git zip if >20MB)
+OneDrive Link: https://iiithydstudents-my.sharepoint.com/:f:/g/personal/somisetty_yogansh_students_iiit_ac_in/IgBdTvbrGNKoRq5VhuMSkI2_AXZuAiIcIE7sZa1QdQGBmzA?e=S80MZq
 
 ---
 
