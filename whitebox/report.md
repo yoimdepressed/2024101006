@@ -4,9 +4,9 @@
 
 ## 1.2 Code Quality Analysis (Pylint Iterations)
 
-Pylint was run on `whitebox/moneypoly/moneypoly/` after each fix. The initial score was **8.17/10**. The final score after all iterations is **9.13/10**.
+Pylint was run on `whitebox/moneypoly/moneypoly/` after each fix. The initial score was **8.17/10**. The final score after all iterations is **10.00/10**.
 
-All E0401 import errors were ignored as per assignment clarification Q3 (false positives caused by running pylint outside the package root).
+All E0401 import errors in earlier runs were false positives caused by running pylint without the package root in `sys.path`. This was resolved in Iteration 19 (see below).
 
 ---
 
@@ -202,7 +202,19 @@ A `# pylint: disable` comment with a justification comment is the correct approa
 
 ---
 
-### Final pylint score: 9.13/10
+### Iteration 19: Added __init__.py and .pylintrc to fix E0401 false-positive import errors
+
+**Warning fixed:** E0401 (import-error) — 12 occurrences across `board.py`, `game.py`, `bank.py`, `player.py`.
+
+**Why:** The `moneypoly` package had no `__init__.py` file, and the `whitebox/code` directory was not in pylint's module search path. This caused pylint to report that all `from moneypoly.xxx import ...` statements were broken, even though the code runs perfectly. The fix was to:
+1. Add an empty `whitebox/code/moneypoly/__init__.py` to properly mark `moneypoly` as a Python package.
+2. Add a `.pylintrc` at the project root with `init-hook='import sys; sys.path.insert(0, "whitebox/code")'` so pylint can find the package regardless of where it is invoked from.
+
+**Files changed:** `moneypoly/__init__.py` (created), `.pylintrc` (created)
+
+---
+
+### Final pylint score: 10.00/10
 
 ---
 
