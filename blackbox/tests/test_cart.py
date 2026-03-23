@@ -68,6 +68,14 @@ def test_cart_update_quantity(auth_headers, empty_cart):
     assert resp.status_code == 400
 
 
+@pytest.mark.xfail(reason="BUG 13: Inactive products (is_active=false) can be added to cart")
+def test_cart_add_inactive_product(auth_headers, empty_cart):
+    # known inactive product from DB
+    payload = {"product_id": 90, "quantity": 1}
+    response = requests.post(f"{BASE_URL}/cart/add", headers=auth_headers, json=payload)
+    assert response.status_code in (400, 404), "Should not allow adding inactive product"
+
+
 def test_cart_remove(auth_headers, empty_cart):
     requests.post(f"{BASE_URL}/cart/add", headers=auth_headers, json={"product_id": 250, "quantity": 1})
     resp = requests.post(f"{BASE_URL}/cart/remove", headers=auth_headers, json={"product_id": 250})

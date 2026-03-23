@@ -299,3 +299,44 @@ All test cases below are based on the [QuickCart API documentation](../QuickCart
 - **Body:** `{"coupon_code": "WELCOME50"}`
 **Expected result:** After applying the WELCOME50 coupon (FIXED, discount_value=50, min_cart_value=100), `GET /api/v1/cart` should show a discount of 50 and reduce the total accordingly.
 **Actual result observed:** The coupon was applied (200 OK), but `GET /api/v1/cart` showed `"total": 0` with no discount field, because the cart total calculation is fundamentally broken (see Bug 3). The coupon system likely uses the broken total for its computation.
+
+### Bug 13: Inactive Products Can Be Added to Cart
+**Endpoint Tested:** `POST /api/v1/cart/add`
+**Request payload:**
+- **Method:** POST
+- **URL:** `http://localhost:8080/api/v1/cart/add`
+- **Headers:** `{"X-Roll-Number": "2024101006", "X-User-ID": "1"}`
+- **Body:** `{"product_id": 90, "quantity": 1}`
+**Expected result:** The API should return `400 Bad Request` or `404 Not Found` because product 90 is explicitly marked as inactive (`is_active: false` in the database).
+**Actual result observed:** The API returned `200 OK` and successfully added the inactive product to the cart.
+
+### Bug 14: WALLET Checkout Ignores Insufficient Balance
+**Endpoint Tested:** `POST /api/v1/checkout`
+**Request payload:**
+- **Method:** POST
+- **URL:** `http://localhost:8080/api/v1/checkout`
+- **Headers:** `{"X-Roll-Number": "2024101006", "X-User-ID": "1"}`
+- **Body:** `{"payment_method": "WALLET"}`
+**Expected result:** When the cart total (e.g., 14,700) exceeds the user's wallet balance (e.g., 534), the checkout should fail with `400 Bad Request` for insufficient funds.
+**Actual result observed:** The API returned `200 OK`, successfully placed the order as `PENDING`, and did *not* deduct any money from the wallet balance. The balance validation is completely missing during checkout.
+
+### Bug 15: Support Ticket Accepts Invalid Status Strings
+**Endpoint Tested:** `PUT /api/v1/support/tickets/{ticket_id}`
+**Request payload:**
+- **Method:** PUT
+- **URL:** `http://localhost:8080/api/v1/support/tickets/151`
+- **Headers:** `{"X-Roll-Number": "2024101006", "X-User-ID": "1"}`
+- **Body:** `{"status": "INVALID_STATUS"}`
+**Expected result:** The API should reject the request with `400 Bad Request` because "INVALID_STATUS" is not one of the allowed explicit ENUM states (OPEN, IN_PROGRESS, CLOSED).
+**Actual result observed:** The API returned `200 OK` and successfully updated the ticket status to the made-up string `"INVALID_STATUS"`.
+
+### Bug 16: Duplicate Reviews Allowed on Same Product
+**Endpoint Tested:** `POST /api/v1/products/{product_id}/reviews`
+**Request payload:**
+- **Method:** POST
+- **URL:** `http://localhost:8080/api/v1/products/2/reviews`
+- **Headers:** `{"X-Roll-Number": "2024101006", "X-User-ID": "1"}`
+- **Body:** `{"rating": 3, "comment": "Second Review"}`
+**Expected result:** If the user has already reviewed product #2, a second POST to the exact same endpoint should return `400 Bad Request` (user can only review a product once).
+**Actual result observed:** The API returned `200 OK` and created a duplicate review under the exact same user ID and product ID.
+

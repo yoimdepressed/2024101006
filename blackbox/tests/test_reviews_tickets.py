@@ -115,13 +115,23 @@ def test_support_ticket_closed_to_open_invalid(auth_headers):
                         json={"status": "OPEN"}).status_code == 400
 
 
-@pytest.mark.xfail(reason="BUG: API allows invalid status transitions for tickets (OPEN directly to CLOSED)")
+@pytest.mark.xfail(reason="BUG 5: API allows invalid status transitions for tickets (OPEN directly to CLOSED)")
 def test_support_ticket_invalid_transition(auth_headers):
     resp = requests.post(f"{BASE_URL}/support/ticket", headers=auth_headers,
                          json={"subject": "Help Login", "message": "Forgot pass"})
     t_id = resp.json().get("ticket", resp.json()).get("ticket_id")
     assert requests.put(f"{BASE_URL}/support/tickets/{t_id}", headers=auth_headers,
                         json={"status": "CLOSED"}).status_code == 400
+
+@pytest.mark.xfail(reason="BUG 15: Support ticket accepts completely invalid status strings")
+def test_support_ticket_invalid_status_string(auth_headers):
+    resp = requests.post(f"{BASE_URL}/support/ticket", headers=auth_headers,
+                         json={"subject": "Help Login", "message": "Testing status string"})
+    t_id = resp.json().get("ticket", resp.json()).get("ticket_id")
+    r_put = requests.put(f"{BASE_URL}/support/tickets/{t_id}", headers=auth_headers,
+                         json={"status": "INVALID_STATUS"})
+    assert r_put.status_code == 400, "Should reject non-enum status string"
+
 
 def test_support_ticket_message_saved_exactly(auth_headers):
     msg = "My specific order #12345 is missing item: Widget Pro X"
@@ -139,3 +149,13 @@ def test_review_missing_fields(auth_headers):
     # Missing rating
     assert requests.post(f"{BASE_URL}/products/250/reviews", headers=auth_headers,
                          json={"comment": "No rating given"}).status_code == 400
+
+@pytest.mark.xfail(reason="BUG 16: Duplicate reviews allowed on same product by same user")
+def test_review_duplicate_submission(auth_headers):
+    payload = {"rating": 5, "comment": "First Review"}
+    r1 = requests.post(f"{BASE_URL}/products/3/reviews", headers=auth_headers, json=payload)
+    assert r1.status_code == 200
+    payload2 = {"rating": 3, "comment": "Second Review"}
+    r2 = requests.post(f"{BASE_URL}/products/3/reviews", headers=auth_headers, json=payload2)
+    assert r2.status_code == 400, "Should not allow multiple reviews per user per product"
+

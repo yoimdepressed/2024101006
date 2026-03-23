@@ -52,9 +52,19 @@ def test_checkout_valid_wallet(auth_headers, empty_cart):
 def test_checkout_valid_card(auth_headers, empty_cart):
     requests.post(f"{BASE_URL}/cart/add", headers=auth_headers, json={"product_id": 250, "quantity": 1})
     payload = {"payment_method": "CARD"}
-    resp = requests.post(f"{BASE_URL}/checkout", headers=auth_headers, json=payload)
-    assert resp.status_code == 200
-    assert resp.json().get("payment_status") == "PAID"
+    response = requests.post(f"{BASE_URL}/checkout", headers=auth_headers, json=payload)
+    assert response.status_code == 200
+    assert response.json().get("payment_status") == "PAID"
+    assert response.json().get("order_status") == "PLACED"
+
+@pytest.mark.xfail(reason="BUG 14: WALLET checkout ignores insufficient balance")
+def test_checkout_wallet_insufficient_balance(auth_headers, empty_cart):
+    # Add a huge amount to cart (14,700+)
+    requests.post(f"{BASE_URL}/cart/add", headers=auth_headers, json={"product_id": 250, "quantity": 50})
+    payload = {"payment_method": "WALLET"}
+    response = requests.post(f"{BASE_URL}/checkout", headers=auth_headers, json=payload)
+    # Since wallet defaults to ~1000 or lower, a 14000+ checkout must fail
+    assert response.status_code == 400, "Should reject WALLET payment if funds are insufficient"
 
 @pytest.mark.xfail(reason="BUG: Checkout does not reduce stock or calculate GST accurately")
 def test_checkout_gst_and_stock_reduction(auth_headers, empty_cart, admin_headers):
