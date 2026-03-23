@@ -14,7 +14,7 @@ def setup_function():
     inventory.set_cash(0)
 
 
-# ── income ────────────────────────────────────────────────────────────────────
+# income 
 
 def test_record_income_adds_to_log():
     finance.record_income(500, "race prize")
@@ -44,7 +44,7 @@ def test_record_income_negative_raises():
         finance.record_income(-50, "negative")
 
 
-# ── expense ───────────────────────────────────────────────────────────────────
+# expense 
 
 def test_record_expense_adds_to_log():
     inventory.set_cash(500)
@@ -78,7 +78,7 @@ def test_record_expense_insufficient_funds_raises():
         finance.record_expense(200, "too expensive")
 
 
-# ── mixed ─────────────────────────────────────────────────────────────────────
+# mixed 
 
 def test_log_preserves_order():
     inventory.set_cash(1000)
