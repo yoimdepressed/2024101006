@@ -1,7 +1,7 @@
 """Player module: represents a single player in a MoneyPoly game."""
 from moneypoly.config import STARTING_BALANCE, BOARD_SIZE, GO_SALARY, JAIL_POSITION
 
-# pylint: disable=too-many-instance-attributes  # Player tracks name, balance, position, jail state, properties, and cards
+# Player tracks name, balance, position, jail state, properties, and cards
 class Player:
     """Represents a single player in a MoneyPoly game."""
 
@@ -13,7 +13,6 @@ class Player:
         self.in_jail = False
         self.jail_turns = 0
         self.get_out_of_jail_cards = 0
-        self.is_eliminated = False
 
 
     def add_money(self, amount):
