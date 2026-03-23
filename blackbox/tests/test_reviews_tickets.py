@@ -159,3 +159,21 @@ def test_review_duplicate_submission(auth_headers):
     r2 = requests.post(f"{BASE_URL}/products/3/reviews", headers=auth_headers, json=payload2)
     assert r2.status_code == 400, "Should not allow multiple reviews per user per product"
 
+@pytest.mark.xfail(reason="BUG 18: Posting review for non-existent product returns 200")
+def test_review_nonexistent_product_returns_404(auth_headers):
+    resp = requests.post(f"{BASE_URL}/products/999999/reviews",
+                         headers=auth_headers,
+                         json={"rating": 5, "comment": "Ghost review"})
+    assert resp.status_code == 404, "Should return 404 when reviewing a non-existent product"
+
+@pytest.mark.xfail(reason="BUG 19: IN_PROGRESS → OPEN reverse transition allowed")
+def test_in_progress_to_open_is_invalid(auth_headers):
+    resp = requests.post(f"{BASE_URL}/support/ticket", headers=auth_headers,
+                         json={"subject": "Reverse Test Ticket", "message": "Testing reverse transition"})
+    t_id = resp.json().get("ticket", resp.json()).get("ticket_id")
+    requests.put(f"{BASE_URL}/support/tickets/{t_id}", headers=auth_headers, json={"status": "IN_PROGRESS"})
+    r = requests.put(f"{BASE_URL}/support/tickets/{t_id}", headers=auth_headers, json={"status": "OPEN"})
+    assert r.status_code == 400, "IN_PROGRESS → OPEN should be rejected (spec: no reverse transitions)"
+
+
+

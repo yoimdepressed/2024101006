@@ -80,6 +80,16 @@ def test_cart_remove(auth_headers, empty_cart):
     requests.post(f"{BASE_URL}/cart/add", headers=auth_headers, json={"product_id": 250, "quantity": 1})
     resp = requests.post(f"{BASE_URL}/cart/remove", headers=auth_headers, json={"product_id": 250})
     assert resp.status_code == 200
+
+@pytest.mark.xfail(reason="BUG 17: /cart/update allows quantity beyond stock limit")
+def test_update_cart_beyond_stock_rejected(auth_headers, empty_cart):
+    """Updating quantity beyond stock via /cart/update must return 400."""
+    requests.post(f"{BASE_URL}/cart/add", headers=auth_headers, json={"product_id": 250, "quantity": 1})
+    # Product 250 generally has under 1000 stock. Trying 99999 should fail.
+    resp = requests.post(f"{BASE_URL}/cart/update", headers=auth_headers,
+                         json={"product_id": 250, "quantity": 99999})
+    assert resp.status_code == 400, "Should reject updating cart quantity beyond available stock"
+
     cart = requests.get(f"{BASE_URL}/cart", headers=auth_headers).json()
     assert len(cart.get("items", [])) == 0
     # removing non-existent

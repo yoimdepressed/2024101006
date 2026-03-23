@@ -340,3 +340,33 @@ All test cases below are based on the [QuickCart API documentation](../QuickCart
 **Expected result:** If the user has already reviewed product #2, a second POST to the exact same endpoint should return `400 Bad Request` (user can only review a product once).
 **Actual result observed:** The API returned `200 OK` and created a duplicate review under the exact same user ID and product ID.
 
+### Bug 17: Cart Update Bypasses Stock Limit Validation
+**Endpoint Tested:** `POST /api/v1/cart/update`
+**Request payload:**
+- **Method:** POST
+- **URL:** `http://localhost:8080/api/v1/cart/update`
+- **Headers:** `{"X-Roll-Number": "2024101006", "X-User-ID": "1"}`
+- **Body:** `{"product_id": 250, "quantity": 99999}`
+**Expected result:** Passing a quantity that greatly exceeds available stock should fail with `400 Bad Request`, similar to `/cart/add`.
+**Actual result observed:** The API returned `200 OK` and updated the cart item quantity to `99999`, completely ignoring the product's actual stock limit.
+
+### Bug 18: Review Endpoint Allows Ghost Reviews For Non-existent Products
+**Endpoint Tested:** `POST /api/v1/products/{product_id}/reviews`
+**Request payload:**
+- **Method:** POST
+- **URL:** `http://localhost:8080/api/v1/products/999999/reviews`
+- **Headers:** `{"X-Roll-Number": "2024101006", "X-User-ID": "1"}`
+- **Body:** `{"rating": 5, "comment": "Ghost review"}`
+**Expected result:** The API should return `404 Not Found` because product 999999 does not exist.
+**Actual result observed:** The API returned `200 OK` and created a review tied to a non-existent product ID.
+
+### Bug 19: Support Ticket Allows Reverse IN_PROGRESS to OPEN Transition
+**Endpoint Tested:** `PUT /api/v1/support/tickets/{ticket_id}`
+**Request payload:**
+- **Method:** PUT
+- **URL:** `http://localhost:8080/api/v1/support/tickets/154`
+- **Headers:** `{"X-Roll-Number": "2024101006", "X-User-ID": "1"}`
+- **Body:** `{"status": "OPEN"}`
+**Expected result:** Transitioning a ticket from `IN_PROGRESS` backward to `OPEN` should be rejected with `400 Bad Request` since the spec says "no other changes are allowed" besides strictly forward transitions.
+**Actual result observed:** The API returned `200 OK` and successfully reverted the ticket status back to `OPEN`.
+
