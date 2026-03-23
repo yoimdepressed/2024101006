@@ -1,24 +1,27 @@
 """Property module: defines purchasable properties and colour groups."""
-# pylint: disable=too-many-instance-attributes  # Property needs name, position, price, rent, mortgage, owner, houses, group
+# Property needs name, position, price, rent, mortgage, owner, group
 class Property:
     """Represents a single purchasable property tile on the MoneyPoly board."""
 
     FULL_GROUP_MULTIPLIER = 2
-    # pylint: disable=too-many-arguments,too-many-positional-arguments  # All 6 args required to fully define a property
-    def __init__(self, name, position, price, base_rent, group=None):
+
+    def __init__(self, name, position, price, base_rent, **kwargs):
         self.name = name
         self.position = position
         self.price = price
         self.base_rent = base_rent
-        self.mortgage_value = price // 2
         self.owner = None
         self.is_mortgaged = False
-        self.houses = 0
 
         # Register with the group immediately on creation
-        self.group = group
-        if group is not None and self not in group.properties:
-            group.properties.append(self)
+        self.group = kwargs.get("group")
+        if self.group is not None and self not in self.group.properties:
+            self.group.properties.append(self)
+
+    @property
+    def mortgage_value(self):
+        """Return the mortgage value, which is half the purchase price."""
+        return self.price // 2
 
     def get_rent(self):
         """

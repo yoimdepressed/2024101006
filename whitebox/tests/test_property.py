@@ -81,7 +81,7 @@ class TestPropertyGetRent:
     def test_get_rent_full_group_doubles_rent(self):
         """Branch: owner holds full group, rent is doubled."""
         group = PropertyGroup("Blue", "blue")
-        prop = Property("Park Lane", 37, 350, 35, group)
+        prop = Property("Park Lane", 37, 350, 35, group=group)
         player = Player("Alice")
         prop.owner = player
         group.properties = [prop]  # only one property in group for simplicity
@@ -96,8 +96,8 @@ class TestPropertyGroupAllOwnedBy:
 
     def _make_group(self):
         group = PropertyGroup("Blue", "blue")
-        p1 = Property("Mayfair", 39, 400, 50, group)
-        p2 = Property("Park Lane", 37, 350, 35, group)
+        p1 = Property("Mayfair", 39, 400, 50, group=group)
+        p2 = Property("Park Lane", 37, 350, 35, group=group)
         return group, p1, p2
 
     def test_all_owned_returns_true_when_all_owned(self):
